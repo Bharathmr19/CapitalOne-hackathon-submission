@@ -9,6 +9,7 @@ import uuid
 from pathlib import Path
 
 from crop_doctor import analyze_crop_image
+from advisor import analyze_market
 
 # Load environment variables
 load_dotenv()
@@ -32,6 +33,37 @@ class CropDiagnosisResponse(BaseModel):
     disease_name: str
     severity: str
     recommended_treatment: str
+
+class MarketRequest(BaseModel):
+    crop_name: str
+    region: str
+
+class MarketResponse(BaseModel):
+    crop_name: str
+    region: str
+    trend_info: dict
+    recommended_action: str | None = None
+    confidence: float | None = None
+    rationale: str | None = None
+    alternate_markets: list | None = None
+    notes: str | None = None
+    sources: list[str]
+
+@app.post("/smart-market", response_model=MarketResponse)
+async def smart_market_endpoint(request: MarketRequest):
+    """
+    Get market analysis and advice for a specific crop in a region.
+    """
+    try:
+        result = await analyze_market(request.crop_name, request.region)
+        return MarketResponse(**result)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error: {str(e)}"
+        )
 
 @app.post("/crop-doctor", response_model=CropDiagnosisResponse)
 async def crop_doctor_endpoint(file: UploadFile = File(...)):

@@ -15,7 +15,7 @@ if not GEMINI_API_KEY:
 
 # Configure Gemini API
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-2.5-pro')
+model = genai.GenerativeModel('gemini-2.5-pro')  # Use the latest model version
 
 def analyze_crop_image(image_file_path: str) -> Dict[str, str]:
     """
@@ -51,12 +51,27 @@ def analyze_crop_image(image_file_path: str) -> Dict[str, str]:
         Important: Respond ONLY with valid JSON."""
 
         # Generate response from Gemini
-        response = model.generate_content([prompt, image])
+        # Convert image to base64 string
+        import base64
+        from io import BytesIO
+        
+        # Convert PIL image to base64
+        buffered = BytesIO()
+        image.save(buffered, format="PNG")
+        img_str = base64.b64encode(buffered.getvalue()).decode()
+        
+        # Add image data to prompt
+        full_prompt = prompt + f"\n\nImage data: {img_str}"
+        
+        response = model.generate_content(full_prompt)
         
         # Extract JSON from the response
         try:
-            # Try to find JSON in the response text
-            response_text = response.text
+            # Get response parts
+            if not response.parts:
+                raise ValueError("No response received from Gemini")
+                
+            response_text = response.parts[0].text
             # Find the first { and last } to extract JSON
             start = response_text.find('{')
             end = response_text.rfind('}') + 1

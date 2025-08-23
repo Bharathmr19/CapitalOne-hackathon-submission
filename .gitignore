@@ -1,20 +1,65 @@
 # Environment variables
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Python
+# Python backend
 __pycache__/
 *.py[cod]
 *$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Virtual Environment
 venv/
 env/
 ENV/
+.venv
+.python-version
+
+# Node.js / React frontend
+frontend/node_modules/
+frontend/.pnp
+frontend/.pnp.js
+frontend/coverage/
+frontend/build/
+frontend/.DS_Store
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
 
 # IDE settings
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # Temporary files
 /tmp/
 *.log
+.DS_Store
+Thumbs.db
+
+# Local database files
+*.sqlite3
+*.db
+
+# Distribution / packaging
+.Python

@@ -95,6 +95,3 @@ We welcome contributions to enhance AgriAssist! Please feel free to submit a pul
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
-- Developed as part of the Agricultural Hackathon 2025
-- Special thanks to all contributors and mentors who made this project possible

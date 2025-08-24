@@ -80,53 +80,12 @@ const SeverityChip = styled(Chip)(({ theme, severity }) => {
   };
 });
 
-const ResultCard = ({ title, content, icon, color }) => {
-  const theme = useTheme();
-  
-  return (
-    <Card 
-      elevation={0} 
-      sx={{ 
-        height: '100%',
-        borderRadius: 2,
-        border: '1px solid',
-        borderColor: `${color}.light`,
-        backgroundColor: `${color}.light`,
-        p: 1,
-        '& .MuiCardContent-root:last-child': {
-          pb: 2
-        }
-      }}
-    >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Box sx={{ 
-            backgroundColor: `${color}.main`, 
-            borderRadius: '50%', 
-            p: 1,
-            mr: 1
-          }}>
-            {icon}
-          </Box>
-          <Typography variant="h6" component="h3" sx={{ fontWeight: 500 }}>
-            {title}
-          </Typography>
-        </Box>
-        <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: 'pre-wrap' }}>
-          {content}
-        </Typography>
-      </CardContent>
-    </Card>
-  );
-};
-
 const CropDoctor = () => {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const theme = useTheme();
   
   const onDrop = (acceptedFiles) => {
     const selectedFile = acceptedFiles[0];

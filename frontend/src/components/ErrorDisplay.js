@@ -32,7 +32,19 @@ const ErrorDisplay = ({
       </Typography>
       
       <Typography variant="body1" sx={{ mb: 3 }}>
-        {error?.detail || error?.message || String(error) || 'An unexpected error occurred. Please try again.'}
+        {(() => {
+          if (typeof error === 'string') return error;
+          if (error?.detail) return error.detail;
+          if (error?.message) return error.message;
+          if (Array.isArray(error)) {
+            return error.map((err, index) => (
+              <div key={index}>
+                {typeof err === 'string' ? err : err.msg || err.detail || JSON.stringify(err)}
+              </div>
+            ));
+          }
+          return 'An unexpected error occurred. Please try again.';
+        })()}
       </Typography>
       
       {resetError && (

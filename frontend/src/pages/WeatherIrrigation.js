@@ -9,24 +9,16 @@ import {
   Button, 
   TextField, 
   MenuItem,
-  Divider,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Paper,
-  Chip,
-  LinearProgress,
-  useTheme
+  Paper
 } from '@mui/material';
 import { 
   WbSunny as WbSunnyIcon,
-  ExpandMore as ExpandMoreIcon,
   WaterDrop as WaterIcon,
   Warning as WarningIcon,
   Opacity as OpacityIcon,
@@ -97,7 +89,6 @@ const WeatherIrrigation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const theme = useTheme();
   
   const handleChange = (event) => {
     const { name, value } = event.target;

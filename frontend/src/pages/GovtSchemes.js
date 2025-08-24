@@ -8,17 +8,12 @@ import {
   Grid, 
   Button, 
   TextField, 
-  Divider,
+  MenuItem,
   Paper,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  List,
-  ListItem,
-  ListItemText,
-  Chip,
-  Link,
-  useTheme
+  Link
 } from '@mui/material';
 import { 
   ReceiptLong as ReceiptLongIcon,
@@ -77,7 +72,6 @@ const GovtSchemes = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const theme = useTheme();
   
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -172,9 +166,9 @@ const GovtSchemes = () => {
                     helperText="Select your state"
                   >
                     {regions.map((region) => (
-                      <option key={region} value={region}>
+                      <MenuItem key={region} value={region}>
                         {region}
-                      </option>
+                      </MenuItem>
                     ))}
                   </TextField>
                   
@@ -190,9 +184,9 @@ const GovtSchemes = () => {
                     required
                   >
                     {crops.map((crop) => (
-                      <option key={crop} value={crop}>
+                      <MenuItem key={crop} value={crop}>
                         {crop}
-                      </option>
+                      </MenuItem>
                     ))}
                   </TextField>
                   
@@ -208,9 +202,9 @@ const GovtSchemes = () => {
                     required
                   >
                     {farmSizes.map((size) => (
-                      <option key={size} value={size}>
+                      <MenuItem key={size} value={size}>
                         {size}
-                      </option>
+                      </MenuItem>
                     ))}
                   </TextField>
                   
@@ -227,9 +221,9 @@ const GovtSchemes = () => {
                     helperText="What type of support are you looking for?"
                   >
                     {needs.map((need) => (
-                      <option key={need} value={need}>
+                      <MenuItem key={need} value={need}>
                         {need}
-                      </option>
+                      </MenuItem>
                     ))}
                   </TextField>
                   

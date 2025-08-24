@@ -9,15 +9,12 @@ import {
   Button, 
   TextField, 
   MenuItem,
-  Divider,
   Paper,
-  Stack,
   List,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Chip,
-  useTheme
+  Chip
 } from '@mui/material';
 import { 
   TrendingUp as TrendingUpIcon,
@@ -55,7 +52,6 @@ const SmartMarket = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const theme = useTheme();
   
   const handleChange = (event) => {
     const { name, value } = event.target;

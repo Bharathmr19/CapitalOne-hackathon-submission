@@ -25,7 +25,7 @@ import {
   ReceiptLong as SchemeIcon,
   BarChart as ProfitIcon
 } from '@mui/icons-material';
-import logo from '../assets/logo.png';
+import logoBase64 from '../assets/logo.js';
 
 const navigationItems = [
   { name: 'Crop Doctor', path: '/crop-doctor', icon: <CropDoctorIcon /> },
@@ -88,7 +88,7 @@ const Header = () => {
           <Toolbar sx={{ justifyContent: 'space-between', padding: '0.5rem 0' }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
-                <img src={logo} alt="AgriSage Logo" className="app-logo" />
+                <img src={logoBase64} alt="AgriSage Logo" className="app-logo" style={{ width: '40px', height: '40px' }} />
                 <Typography variant="h6" component="div" sx={{ ml: 1, fontWeight: 600, color: '#4CAF50' }}>
                   AgriSage
                 </Typography>

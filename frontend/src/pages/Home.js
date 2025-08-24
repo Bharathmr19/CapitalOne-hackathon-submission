@@ -10,9 +10,7 @@ import {
   CardContent, 
   CardMedia, 
   CardActions,
-  Divider,
-  Stack,
-  Link
+  Stack
 } from '@mui/material';
 import { 
   LocalHospital as CropDoctorIcon,

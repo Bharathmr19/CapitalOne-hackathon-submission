@@ -116,24 +116,26 @@ class SchemeResponse(BaseModel):
     sources: List[str]
 
 class ProfitRequest(BaseModel):
-    region: str
-    crop: str
-    farm_size: str
+    crop_name: str
+    land_area: str
+    cost_seeds: str
+    cost_fertilizer: str
+    cost_pesticides: str
+    cost_irrigation: str
+    cost_labor: str
+    cost_others: str
     expected_yield: str
-    cost_factors: str
+    total_cost: float
 
 class ProfitResponse(BaseModel):
-    crop_name: str
-    region: str
-    estimated_yield: str
-    market_price: str
-    total_cost: str
-    expected_revenue: str
-    expected_profit: str
-    risk_factors: List[str]
-    recommendation: str
-    notes: str
-    error: Optional[str] = None
+    estimated_revenue: str
+    estimated_profit: str
+    roi: str
+    analysis: str
+    risk_assessment: str
+    risk_factors: Optional[List[dict]] = None
+    market_outlook: Optional[str] = None
+    market_price_range: Optional[dict] = None
     sources: List[str]
 
 @app.post("/weather-irrigation", response_model=WeatherIrrigationResponse)
@@ -289,17 +291,17 @@ async def govt_schemes_endpoint(request: SchemeRequest):
 @app.post("/crop-profit", response_model=ProfitResponse)
 async def crop_profit_endpoint(request: ProfitRequest):
     """
-    Get profit prediction for a specific crop in a region with given parameters.
+    Get profit prediction for a specific crop with detailed cost breakdown.
     
     Args:
-        request (ProfitRequest): The crop and farm details
+        request (ProfitRequest): The crop and cost details
         
     Returns:
         ProfitResponse: Detailed profit analysis and recommendations
     """
     try:
         # Validate required fields
-        required_fields = ["region", "crop", "farm_size", "expected_yield", "cost_factors"]
+        required_fields = ["crop_name", "land_area", "expected_yield"]
         for field in required_fields:
             if not getattr(request, field):
                 raise HTTPException(
@@ -307,13 +309,20 @@ async def crop_profit_endpoint(request: ProfitRequest):
                     detail=f"Missing required field: {field}"
                 )
         
-        # Convert request model to dictionary
+        # Convert request model to dictionary format expected by profit_prediction module
         user_input = {
-            "region": request.region,
-            "crop": request.crop,
-            "farm_size": request.farm_size,
+            "crop_name": request.crop_name,
+            "land_area": request.land_area,
             "expected_yield": request.expected_yield,
-            "cost_factors": request.cost_factors
+            "total_cost": request.total_cost,
+            "cost_breakdown": {
+                "seeds": request.cost_seeds,
+                "fertilizer": request.cost_fertilizer,
+                "pesticides": request.cost_pesticides,
+                "irrigation": request.cost_irrigation,
+                "labor": request.cost_labor,
+                "others": request.cost_others
+            }
         }
         
         # Process the request through profit prediction

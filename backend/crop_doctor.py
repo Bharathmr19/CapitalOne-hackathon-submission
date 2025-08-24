@@ -15,7 +15,7 @@ if not GEMINI_API_KEY:
 
 # Configure Gemini API
 genai.configure(api_key=GEMINI_API_KEY)
-model = genai.GenerativeModel('gemini-2.5-pro')  # Use the latest model version
+model = genai.GenerativeModel('gemini-2.5-flash')  # Use vision-capable model
 
 def analyze_crop_image(image_file_path: str) -> Dict[str, str]:
     """
@@ -40,44 +40,51 @@ def analyze_crop_image(image_file_path: str) -> Dict[str, str]:
         image = Image.open(image_path)
         
         # Prepare the prompt for Gemini
-        prompt = """You are an expert agricultural crop disease diagnostician. 
-        Analyze this crop image and provide a detailed diagnosis. 
-        Return your analysis in JSON format with these exact fields:
+        prompt = """You are an expert agricultural pathologist and crop disease diagnostician. 
+        Carefully analyze this crop/plant image for any signs of disease, pest damage, or health issues.
+        
+        Look for:
+        - Leaf spots, discoloration, or unusual markings
+        - Wilting, browning, or yellowing of leaves
+        - Pest damage or insect presence
+        - Fungal growth or bacterial infections
+        - Overall plant health indicators
+        
+        Provide your analysis in this exact JSON format:
         {
-            "disease_name": "Name of the identified disease",
-            "severity": "Low/Medium/High based on visible symptoms",
-            "recommended_treatment": "Detailed treatment recommendations"
+            "disease_name": "Specific disease name or 'Healthy' if no issues found",
+            "severity": "Low/Medium/High or 'None' if healthy",
+            "recommended_treatment": "Detailed treatment recommendations including fungicides, pesticides, cultural practices, or preventive measures"
         }
-        Important: Respond ONLY with valid JSON."""
+        
+        Be specific and actionable in your recommendations. If the plant appears healthy, mention preventive care tips.
+        Respond ONLY with valid JSON - no additional text."""
 
-        # Generate response from Gemini
-        # Convert image to base64 string
-        import base64
-        from io import BytesIO
-        
-        # Convert PIL image to base64
-        buffered = BytesIO()
-        image.save(buffered, format="PNG")
-        img_str = base64.b64encode(buffered.getvalue()).decode()
-        
-        # Add image data to prompt
-        full_prompt = prompt + f"\n\nImage data: {img_str}"
-        
-        response = model.generate_content(full_prompt)
+        # Generate response from Gemini with image
+        response = model.generate_content([prompt, image])
         
         # Extract JSON from the response
         try:
             # Get response parts
             if not response.parts:
+                print(f"Debug: Response object: {response}")
+                print(f"Debug: Response candidates: {getattr(response, 'candidates', 'None')}")
                 raise ValueError("No response received from Gemini")
                 
             response_text = response.parts[0].text
+            print(f"Debug: Raw response text: {response_text}")
+            
             # Find the first { and last } to extract JSON
             start = response_text.find('{')
             end = response_text.rfind('}') + 1
             
             if start == -1 or end == 0:
-                raise ValueError("No JSON found in response")
+                # If no JSON found, try to create a structured response from the text
+                return {
+                    "disease_name": "Analysis completed",
+                    "severity": "Unable to determine",
+                    "recommended_treatment": response_text
+                }
                 
             json_str = response_text[start:end]
             result = json.loads(json_str)

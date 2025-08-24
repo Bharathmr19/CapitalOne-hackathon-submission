@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -17,14 +17,12 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Tooltip,
   IconButton,
-  useTheme
+  MenuItem
 } from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
   Info as InfoIcon,
-  ShowChart as ShowChartIcon,
   ContentCopy as ContentCopyIcon,
   PieChart as PieChartIcon,
   Download as DownloadIcon
@@ -35,26 +33,11 @@ import LoadingIndicator from '../components/LoadingIndicator';
 import ErrorDisplay from '../components/ErrorDisplay';
 import { predictCropProfit } from '../services/api';
 
-// Sample market price data - in a real app, this would come from an API
-const marketData = {
-  'Rice': { min: 18, max: 25 },
-  'Wheat': { min: 19, max: 24 },
-  'Maize': { min: 15, max: 21 },
-  'Sugarcane': { min: 2.5, max: 3.5 },
-  'Cotton': { min: 50, max: 60 },
-  'Groundnut': { min: 45, max: 55 },
-  'Soybean': { min: 35, max: 42 },
-  'Mustard': { min: 40, max: 50 },
-  'Potato': { min: 10, max: 15 },
-  'Tomato': { min: 12, max: 30 },
-  'Onion': { min: 15, max: 35 },
-  'Chili': { min: 60, max: 100 },
-  'Turmeric': { min: 65, max: 85 },
-  'Banana': { min: 25, max: 40 },
-  'Mango': { min: 40, max: 80 }
-};
-
-const cropOptions = Object.keys(marketData);
+const cropOptions = [
+  'Rice', 'Wheat', 'Maize', 'Sugarcane', 'Cotton', 
+  'Groundnut', 'Soybean', 'Mustard', 'Potato', 'Tomato',
+  'Onion', 'Chili', 'Turmeric', 'Banana', 'Mango'
+];
 
 const CropProfit = () => {
   const [formData, setFormData] = useState({
@@ -71,7 +54,7 @@ const CropProfit = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
-  const theme = useTheme();
+  const [marketPrice, setMarketPrice] = useState(null);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -80,6 +63,39 @@ const CropProfit = () => {
       [name]: value
     });
   };
+
+  // Fetch market price when crop changes
+  useEffect(() => {
+    if (formData.crop_name) {
+      // Create a minimal payload to get market price info
+      const pricePayload = {
+        crop_name: formData.crop_name,
+        land_area: '1',
+        expected_yield: '1',
+        total_cost: 0,
+        cost_seeds: '0',
+        cost_fertilizer: '0', 
+        cost_pesticides: '0',
+        cost_irrigation: '0',
+        cost_labor: '0',
+        cost_others: '0'
+      };
+      
+      // Fetch market price data quietly (don't show loading/error for this)
+      predictCropProfit(pricePayload)
+        .then(data => {
+          if (data.market_price_range) {
+            setMarketPrice(data.market_price_range);
+          }
+        })
+        .catch(err => {
+          // Silently fail for market price fetch
+          console.log('Could not fetch market price:', err);
+        });
+    } else {
+      setMarketPrice(null);
+    }
+  }, [formData.crop_name]);
 
   const calculateTotalCost = () => {
     const costs = [
@@ -116,7 +132,7 @@ const CropProfit = () => {
         total_cost: totalCost,
       };
       
-  const data = await predictCropProfit(payload);
+      const data = await predictCropProfit(payload);
       setResult(data);
       
       toast.success('Profit analysis completed');
@@ -146,9 +162,17 @@ const CropProfit = () => {
   };
   
   const getCurrentMarketRate = () => {
-    if (!formData.crop_name || !marketData[formData.crop_name]) return null;
+    // If we have result data with market information, use it
+    if (result && result.market_price_range) {
+      return result.market_price_range;
+    }
     
-    return marketData[formData.crop_name];
+    // If we have fetched market price for current crop, use it
+    if (marketPrice && formData.crop_name) {
+      return marketPrice;
+    }
+    
+    return null;
   };
 
   const copyResults = () => {
@@ -215,9 +239,9 @@ const CropProfit = () => {
                         required
                       >
                         {cropOptions.map((crop) => (
-                          <option key={crop} value={crop}>
+                          <MenuItem key={crop} value={crop}>
                             {crop}
-                          </option>
+                          </MenuItem>
                         ))}
                       </TextField>
                     </Grid>
@@ -363,11 +387,16 @@ const CropProfit = () => {
                       {formData.crop_name && getCurrentMarketRate() && (
                         <Paper sx={{ p: 2, bgcolor: 'background.default', mt: 2, mb: 2 }}>
                           <Typography variant="subtitle2" gutterBottom>
-                            Current Market Price (per quintal)
+                            Current Market Price Range ({getCurrentMarketRate().unit || 'per quintal'})
                           </Typography>
                           <Typography variant="body1">
                             ₹{getCurrentMarketRate().min} - ₹{getCurrentMarketRate().max}
                           </Typography>
+                          {result && result.market_outlook && (
+                            <Typography variant="caption" color="textSecondary" sx={{ mt: 1, display: 'block' }}>
+                              {result.market_outlook}
+                            </Typography>
+                          )}
                         </Paper>
                       )}
                     </Grid>
